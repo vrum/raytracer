@@ -71,9 +71,7 @@ private:
      int nextRow;
 };
 
-Vector3D shade(Vector3D fc, std::list<Light*> lights, Colour ambient, Intersection* col, Point3D eye, SceneNode* root, MasterTempo* mt);
+Vector3D shade(Vector3D fc, std::list<Light*> lights, Colour ambient, Intersection col, Point3D eye, SceneNode* root, MasterTempo* mt);
 
-void applySinCityFilter(double* rbuf, int height, int width, double filterWeight);
-void applyCocaineFilter(double* rbuf, int h, int w);
 
 #endif

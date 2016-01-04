@@ -56,7 +56,7 @@ std::ostream& operator<<(std::ostream& out, const Mesh& mesh)
 }
 
 
-Intersection* Mesh::getIntersection(Point3D rayP, Vector3D rayV, Matrix4x4 trans){
+void Mesh::getIntersection(Ray ray, Intersection &inter, Matrix4x4 trans){
   // vector<Face> (face = typedef vector<int> m_faces
   // vector<Point3D> m_verts
 
@@ -65,8 +65,11 @@ Intersection* Mesh::getIntersection(Point3D rayP, Vector3D rayV, Matrix4x4 trans
   Vector3D normal;
   Point3D point;
 
-  if(boundingSphere->getIntersection(rayP, rayV, trans) == NULL)
-   return NULL;
+  Intersection boundTest;
+  boundingSphere->getIntersection(ray, boundTest, trans);
+  if(!boundTest.isValid()){
+    return;
+  }
 
   for(std::vector<Face>::const_iterator F = m_faces.begin();
       F != m_faces.end(); ++F){
@@ -80,8 +83,8 @@ Intersection* Mesh::getIntersection(Point3D rayP, Vector3D rayV, Matrix4x4 trans
       cross(vertices.at(2) - vertices.at(0));
     double area = tnorm.length();
     tnorm.normalize(); // not sure if necessary
-    hitTest = intersectPlane(rayP, rayV, vertices.at(0), tnorm);
-    Point3D hit = rayP + hitTest*rayV;
+    hitTest = intersectPlane(ray, vertices.at(0), tnorm);
+    Point3D hit = ray.point + hitTest*ray.vector;
 
     bool inTri = true;
     double areaSum = 0.0;
@@ -100,9 +103,8 @@ Intersection* Mesh::getIntersection(Point3D rayP, Vector3D rayV, Matrix4x4 trans
   }
 
   if(t < 0)
-    return NULL;
+    return;
 
-  Intersection *ans = (Intersection*)malloc(sizeof(Intersection));
-  *ans = Intersection(point, normal, NULL);
-  return ans;
+  //Intersection *ans = (Intersection*)malloc(sizeof(Intersection));
+  inter = Intersection(point, normal, NULL);
 }
